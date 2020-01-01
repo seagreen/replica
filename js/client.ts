@@ -345,6 +345,7 @@ function patchAttribute(ws: WebSocket, element: any, onProp: boolean, adiff: Att
 
 function buildDOM(ws: WebSocket, dom: DOM, index: number | null, parent: Element): Element {
   let element = null;
+  let namespace = null;
 
   switch (dom.type) {
     case 'text':
@@ -352,7 +353,10 @@ function buildDOM(ws: WebSocket, dom: DOM, index: number | null, parent: Element
       break;
 
     case 'leaf':
-      element = document.createElement(dom.element);
+
+      namespace = dom.attrs.xmlns;
+
+      element = namespace ? document.createElementNS(namespace, dom.element) : document.createElement(dom.element);
 
       for (const [key, value] of Object.entries(dom.attrs)) {
         patchAttribute(ws, element, false, { type: 'insert', key, value });
@@ -361,7 +365,10 @@ function buildDOM(ws: WebSocket, dom: DOM, index: number | null, parent: Element
       break;
 
     case 'node':
-      element = document.createElement(dom.element);
+
+      namespace = dom.attrs.xmlns;
+
+      element = namespace ? document.createElementNS(namespace, dom.element) : document.createElement(dom.element);
 
       for (let i = 0; i < dom.children.length; i++) {
         buildDOM(ws, dom.children[i], null, element);
